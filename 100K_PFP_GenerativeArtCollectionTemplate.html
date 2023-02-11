@@ -1,0 +1,134 @@
+<body>
+    <div class="controls">
+        <div class="input-container">
+            <button id="random-button">Shuffle Lobes</button>
+            <input type="number" id="combination-input" value="1">
+        </div>
+    </div>
+    <div class="smiley-container">
+        <svg viewBox="0 0 100 100" class="smiley">
+            <rect x="0" y="0" width="100" height="100" id="background" fill="lightgray" />
+            <circle cx="50" cy="61" r="35" id="face" fill="white" />
+            <circle cx="38" cy="58" r="3" id="eye-1" fill="blue" />
+            <circle cx="62" cy="58" r="3" id="eye-2" fill="blue" />
+            <path d="M 32 73 Q 50 85 68 73" id="mouth" stroke="blue" stroke-width="3" fill="none" />
+            <circle cx="50" cy="62" r="35" fill="none" stroke="black" stroke-width="2" />
+            <rect x="25" y="3" width="50" height="40" fill="black" />
+            <rect x="25" y="23" width="50" height="10" fill="red" />
+            <rect x="12.5" y="33" width="75" height="10" fill="black" />
+        </svg>
+
+    </div>
+
+    <style>
+        body {
+            background-color: slategray;
+        }
+
+        .smiley {
+            width: 100%;
+            height: 100%;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <script>
+        const eyeColors = [
+            "#000000", "#0C090A", "#2C3539", "#2B1B17", "#34282C", "#25383C", "#3B3B3B",
+            "#1E2321", "#696969", "#4F3A3C", "#B5B5B5", "#FF00FF", "#E0E2E2", "#BFBFBF",
+            "#9B9B9B", "#828282", "#727272", "#626262", "#5A5A5A", "#4B0082", "#3B0B39",
+            "#6A5ACD", "#708090", "#8B008B", "#4B0048", "#2F4F4F"
+        ];
+
+        const mouthColors = [
+            "#000000", "#FF0000", "#800000", "#FFFF00", "#808000", "#00FF00", "#008000",
+            "#00FFFF", "#008080", "#0000FF", "#000080", "#FF00FF", "#800080", "#B22222",
+            "#2B1B17", "#DC143C", "#727272", "#626262", "#C71585", "#DB7093", "#FFB6C1",
+            "#FFC0CB", "#FA8072", "#000002", "#FF4500", "#FF6347"
+        ];
+
+        const skinColors = [
+            "#FFFFFF", "#FFF8DC", "#FFFACD", "#FAFAD2", "#F0E68C", "#EEE8AA", "#F5F5DC",
+            "#FFEBCD", "#FFE4B5", "#FFDEAD", "#FFF5EE", "#F0FFF0", "#F0FFFF", "#E0FFFF",
+            "#E6E6FA", "#DCDCDC", "#F5F5F5", "#FFF", "#F5F5DC", "#F8F8FF", "#F5FFFA",
+            "#E0EEE0", "#E0FFFF", "#FAF0E6", "#F0F8FF", "#E6E6E6"
+        ];
+
+        const backgroundColors = [
+            "#FFFACD", "#F0E68C", "#ADD8E6", "#E0FFFF", "#FAFAD2", "#90EE90", "#D3D3D3",
+            "#FFB6C1", "#FFA07A", "#F5DEB3", "#a4fc7c", "#FFFFE0", "#F0FFF0", "#F0FFFF",
+            "#E6E6FA", "#FFF0F5", "#FFE4B5", "#FFE4E1", "#FFF5EE", "#F0F8FF", "#E1E1E1",
+            "#DCDCDC", "#F5F5F5", "#0C38BF", "#F5F5DC"
+        ];
+
+
+        const eyes = [document.querySelector("#eye-1"), document.querySelector("#eye-2")];
+        const mouth = document.querySelector("#mouth");
+        const backgroundColor = document.querySelector("#background");
+        const face = document.querySelector("#face");
+
+        const input = document.getElementById("combination-input");
+        const randomButton = document.getElementById("random-button");
+
+        let currentCombination = 0;
+        let combinations = [];
+
+        const updateSmiley = () => {
+            eyes[0].setAttribute("fill", eyeColors[combinations[currentCombination][0]]);
+            eyes[1].setAttribute("fill", eyeColors[combinations[currentCombination][0]]);
+            mouth.setAttribute("stroke", mouthColors[combinations[currentCombination][1]]);
+            backgroundColor.setAttribute("fill", backgroundColors[combinations[currentCombination][2]]);
+            face.setAttribute("fill", skinColors[combinations[currentCombination][2]]);
+
+            if (Math.random() > 0.5) {
+                mouth.setAttribute("d", "M 32 73 Q 50 85 68 73");
+            } else {
+                mouth.setAttribute("d", "M 25 73 L 75 73");
+            }
+        };
+
+        const initializeWithRandom = () => {
+            currentCombination = Math.floor(Math.random() * 100000);
+            input.value = currentCombination + 1;
+            updateSmiley();
+        };
+
+        for (let i = 0; i < 100000; i++) {
+            combinations.push([
+                i % 25,
+                Math.floor(i / 25) % 25,
+                Math.floor(i / 625) % 25,
+                Math.floor(i / 15625) % 25
+            ]);
+        }
+        const setCombination = (tokenId) => {
+            currentCombination = tokenId - 1;
+            input.value = currentCombination + 1;
+            updateSmiley();
+        }
+
+        input.addEventListener("change", () => {
+            setCombination(Number(input.value));
+        });
+
+        randomButton.addEventListener("click", () => {
+            currentCombination = Math.floor(Math.random() * 100000);
+            input.value = currentCombination + 1;
+            updateSmiley();
+        });
+
+        const tokenId = new URL(window.location.href).searchParams.get("tokenId");
+
+        if (tokenId) {
+            setCombination(Number(tokenId));
+        } else {
+            initializeWithRandom();
+        }
+    </script>
+</body>
